@@ -1,0 +1,205 @@
+{% comment %} {% extends 'blog/base.html' %} {% endcomment %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Django rest framework 02</h1>
+    <div class="row">
+        <div class="col">
+
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading_two">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapse_two" aria-expanded="true" aria-controls="collapse_two">
+                            models.py #
+                        </button>
+                    </h2>
+                    <div id="collapse_two" class="accordion-collapse collapse show" aria-labelledby="heading_two"
+                        data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <h1>models.py file</h1>
+                            <pre><code class="language-python">
+from django.db import models
+
+# Create your models here.
+
+
+class Student(models.Model):
+title = models.CharField(max_length=100)
+code = models.CharField(max_length=100)
+
+class Meta:
+    ordering = ['id']
+</code></pre>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo_two">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseTwo_two" aria-expanded="false" aria-controls="collapseTwo_two">
+                            serializers.py #
+                        </button>
+                    </h2>
+                    <div id="collapseTwo_two" class="accordion-collapse collapse" aria-labelledby="headingTwo_two"
+                        data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+
+<h1>serializers.py file</h1>
+<pre><code class="language-python">
+from . models import Student
+from rest_framework import serializers
+
+
+class StudentSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=100)
+    code = serializers.CharField(max_length=100)
+
+    def create(self, validated_data):
+        """
+            Create and return a new `Student` instance, given the validated data.
+        """
+        return Student.objects.create(**validated_data)
+                                
+</code></pre>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree_two">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseThree_two" aria-expanded="false" aria-controls="collapseThree_two">
+                            views.py #
+                        </button>
+                    </h2>
+                    <div id="collapseThree_two" class="accordion-collapse collapse" aria-labelledby="headingThree_two"
+                        data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+<h1>views.py file</h1>
+<pre><code class="language-python">
+from django.shortcuts import render
+from django.http import HttpResponse
+from .models import Student
+from . serializers import StudentSerializer
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+import io
+# Create your views here.
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def student_detail(request):
+    ''' Deserialization is here '''
+    if request.method == 'POST':
+        json_data = request.body
+        # print()
+        # print(json_data)
+        # print()
+        stream = io.BytesIO(json_data)
+        python_data = JSONParser().parse(stream)
+        serializer = StudentSerializer(data=python_data)
+        if serializer.is_valid():
+            # print()
+            # print(serializer)
+            # print()
+            serializer.save()
+            res = {'msg': 'data created'}
+            json_data = JSONRenderer().render(res)
+            return HttpResponse(json_data, content_type='application/json')
+
+        json_data = JSONRenderer().render(serializer.errors)
+        return HttpResponse(json_data, content_type='application/json')
+    return HttpResponse("Hello, world!")
+
+    ''' Serialization is there '''
+    # stu = Student.objects.get(id=3)
+    # serializer = StudentSerializer(stu)
+    # json_data = JSONRenderer().render(serializer.data)
+    # return HttpResponse(json_data, content_type='application/json')
+
+    # python_stu = Student.objects.get(id=1)
+    # python_serializer = StudentSerializer(python_com)
+    # json_data = JSONRenderer().render(python_serializer)
+    # return HttpResponse(json_data, content_type='application/json')
+
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+<!-- end here  -->
+
+
+<!-- start here -->
+<div class="accordion-item">
+    <h2 class="accordion-header" id="fifthone">
+    <!-- <h2 class="accordion-header" id="headingThree"> -->
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#fifthonefour_two" aria-expanded="false" aria-controls="fifthonefour_two">
+            urls.py #
+        </button>
+    </h2>
+    <div id="fifthonefour_two" class="accordion-collapse collapse" aria-labelledby="fifthonefour_two"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+<h1>urls.py file</h1>
+<pre><code class="language-python">
+from django.contrib import admin
+from django.urls import path
+from api.views import student_detail
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('stu/', student_detail, name='student-detail'),
+]
+</code></pre>
+        </div>
+    </div>
+</div>
+<!-- end here  -->
+
+
+<!-- start here -->
+<div class="accordion-item">
+    <h2 class="accordion-header" id="fourthone">
+    <!-- <h2 class="accordion-header" id="headingThree"> -->
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#two_two_two" aria-expanded="false" aria-controls="two_two_two">
+            another file could be java/python file #
+        </button>
+    </h2>
+    <div id="two_two_two" class="accordion-collapse collapse" aria-labelledby="two_two_two"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+<h1>python_data.py file</h1>
+<pre><code class="language-python">
+import requests
+import json
+
+url = 'http://127.0.0.1:8000/stu/'
+data = {
+    'title': 'Activate Virtuel env in Linux 2',
+    'code': 'source env activate'
+}
+json_data = json.dumps(data)
+res = requests.post(url=url, data=json_data)
+data = res.json()
+print(data)
+
+</code></pre>
+        </div>
+    </div>
+</div>
+<!-- end here  -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
